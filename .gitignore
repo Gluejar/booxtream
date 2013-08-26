@@ -1,6 +1,7 @@
 *.db
 *.log
 *.dot
+*.pyc
 reports
 ENV
 .DS_Store
