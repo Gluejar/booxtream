@@ -52,7 +52,9 @@ class BooXtream(object):
         files= {'epubfile': epubfile} if epubfile else {}
         resp = self.postrequest(url, data=kwargs, files=files)
         doc = ElementTree.fromstring(resp.content)
-        errors = doc.findall('.//Error')
+
+        # it turns out an Error can have an Error in it
+        errors = doc.findall('.//Response/Error') 
         if len(errors) > 0:
             raise BooXtreamError(errors)
         download_link_epub = doc.find('.//DownloadLink[@type="epub"]')
