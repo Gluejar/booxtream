@@ -2,6 +2,7 @@ import unittest
 import time
 import urllib2 
 from tempfile import NamedTemporaryFile
+from StringIO import StringIO
 
 class TestBooXtream(unittest.TestCase):
     def setUp(self):
@@ -42,3 +43,11 @@ class TestBooXtream(unittest.TestCase):
         self.assertRegexpMatches(boox.download_link_epub,'download.booxtream.com/')
         self.assertFalse(boox.expired)
         self.assertEqual(boox.downloads_remaining,3)
+        
+        # make sure it works with an in-memory file
+        self.epub2file.seek(0)
+        in_mem_epub = StringIO()
+        in_mem_epub.write(self.epub2file.read())
+        in_mem_epub.seek(0)
+        boox2=inst.platform(epubfile=in_mem_epub, **params)
+        self.assertRegexpMatches(boox2.download_link_epub,'download.booxtream.com/')
