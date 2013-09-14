@@ -1,10 +1,17 @@
 import unittest
 import time
-
-# uses settings.BOOXTREAM_TEST_EPUB
-from . import settings
+import urllib2 
+from tempfile import NamedTemporaryFile
 
 class TestBooXtream(unittest.TestCase):
+    def setUp(self):
+        # get a small epub test file as a file-like object
+        self.epub2file = NamedTemporaryFile(delete=False)
+        test_file_content = urllib2.urlopen('http://www.hxa.name/articles/content/EpubGuide-hxa7241.epub')
+        self.epub2file.write(test_file_content.read())
+        self.epub2file.seek(0)
+
+
     def _makeOne(self):
         from . import BooXtream
         manager = BooXtream()
@@ -31,8 +38,7 @@ class TestBooXtream(unittest.TestCase):
             'disclaimer':1,
             }
         params['referenceid']= 'order'+str(time.time())
-        epubfile= open(settings.BOOXTREAM_TEST_EPUB)
-        boox=inst.platform(epubfile=epubfile, **params)
+        boox=inst.platform(epubfile=self.epub2file, **params)
         self.assertRegexpMatches(boox.download_link_epub,'download.booxtream.com/')
         self.assertFalse(boox.expired)
         self.assertEqual(boox.downloads_remaining,3)
